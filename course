@@ -1,0 +1,44 @@
+create database mrawk;
+use mrawk;
+create table student
+(
+regno varchar(20) primary key,
+name1 varchar(20),
+major varchar(20),
+bday date
+);
+create table course
+(
+courseid varchar(20) primary key,
+cname varchar(20),
+dept varchar(20)
+);
+create table text1
+(
+ISBN int primary key,
+book_title varchar(20),
+publisher varchar(20),
+author varchar(20)
+);
+create table adoption(
+courseid varchar(20),
+ISBN int,
+sem int,
+primary key (courseid,ISBN),
+foreign key (courseid) references course(courseid),
+foreign key (ISBN) references text1(ISBN)
+); 
+drop table student;
+create table enroll
+(
+regno varchar(20),
+courseid varchar(20),
+sem int,
+marks int,
+primary key( regno,courseid),
+foreign key (regno) references student(regno),
+foreign key (courseid) references course(courseid)
+);
+insert into student values("1DB01CS02","DIVYA","CSE",'1985-10-12'),("1DB01ME03","BABU","MECH",'1982-09-23'),
+("1DB01EC04","JOHN","E&C",'1984-02-21'),
+("1DB01CS05","ASHA","CSE",'1979-10-07');
