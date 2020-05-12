@@ -1,0 +1,122 @@
+create database supplier;
+use supplier;
+show tables;
+create table SUPPLIERS(
+sid int primary key,
+sname varchar(20),
+city varchar(20));
+drop table suppliers;
+create table PARTS(
+pid int primary key, 
+pname varchar(20),
+color varchar(10));
+create table CATALOG(
+sid int,
+pid int,  
+foreign key(sid) references SUPPLIERS(sid) on delete cascade, 
+foreign key(pid) references PARTS(pid) on delete  cascade,
+cost float(6),
+primary key(sid, pid)
+);
+
+
+
+insert into suppliers values(10001, 'Acme Widget','Bangalore');
+insert into suppliers values(10002, 'Johns','Kolkata');
+insert into suppliers values(10003, 'Vimal','Mumbai');
+insert into suppliers values(10004, 'Reliance','Delhi');
+select * from suppliers;
+
+insert into PARTS values(20001, 'Book','Red');
+insert into PARTS values(20002, 'Pen','Red');
+insert into PARTS values(20003, 'Pencil','Green');
+insert into PARTS values(20004, 'Mobile','Green');
+insert into PARTS values(20005, 'Charger','Black');
+select * from parts;
+
+
+
+
+insert into CATALOG values(10001,20001,10);
+insert into CATALOG values(10001,20002,10);
+insert into CATALOG values(10001,20003,30);
+insert into CATALOG values(10001,20004,10);
+insert into CATALOG values(10001,20005,10);
+insert into CATALOG values(10002,20001,10);
+insert into CATALOG values(10002,20002,20);
+insert into CATALOG values(10003,20003,30);
+insert into CATALOG values(10004,20003,40);
+select * from catalog;
+
+/* Query 2 i took 1st sid from suppliers and
+subtracted all the respected pid (ie pid from catalog
+and pid from parts) and which sid got 0 i'm 
+printing it*/
+select s.sname from suppliers s
+where not exists(
+select p.pid from parts p
+where p.pid not in
+(select c.pid from 
+catalog c
+where c.sid = s.sid)
+);
+/* query 3
+
+*/
+
+select s.sname 
+from suppliers s
+where not exists 
+(
+select p.pid from
+parts p where p.color='Red'
+and  p.pid not in
+(select c.pid from 
+catalog c
+where c.sid= s.sid)
+);
+
+
+# query 4
+
+
+select pname from 
+parts 
+where pid in
+(select c.pid from catalog c,
+suppliers s
+where c.sid = s.sid 
+and sname="Acme Widget"
+and c.pid not in
+(
+select pid from catalog c,
+suppliers s where sname != "Acme Widget"
+and s.sid = c.sid
+));
+
+# query 5 
+SELECT DISTINCT C.sid FROM Catalog C
+    WHERE C.cost > ( SELECT AVG (C1.cost)
+    FROM Catalog C1
+   WHERE C1.pid = C.pid );
+   
+ # query 6
+ SELECT P.pid, S.sname
+FROM Parts P, Suppliers S, Catalog C
+WHERE C.pid = P.pid
+AND C.sid = S.sid
+AND C.cost = (SELECT MAX (C1.cost)
+		FROM Catalog C1
+		WHERE C1.pid = P.pid);
+
+
+
+
+
+
+
+
+
+     
+     
+
