@@ -1,0 +1,127 @@
+use pgm9;
+CREATE TABLE ACTOR ( 
+ACT_ID int (3), 
+ACT_NAME VARCHAR (20), 
+ACT_GENDER CHAR (1), 
+PRIMARY KEY (ACT_ID)
+);
+
+CREATE TABLE DIRECTOR ( 
+DIR_ID int (3), 
+DIR_NAME VARCHAR (20), 
+DIR_PHONE int (10), 
+PRIMARY KEY (DIR_ID)
+); 
+
+CREATE TABLE MOVIES ( 
+MOV_ID int (4), 
+MOV_TITLE VARCHAR (25), 
+MOV_YEAR int (4), 
+MOV_LANG VARCHAR (12), 
+DIR_ID int (3), 
+PRIMARY KEY (MOV_ID), 
+FOREIGN KEY (DIR_ID) 
+REFERENCES DIRECTOR (DIR_ID)
+);
+
+CREATE TABLE MOVIE_CAST 
+( 
+ACT_ID int (3), 
+MOV_ID int (4), 
+ROLE VARCHAR (10), 
+PRIMARY KEY (ACT_ID, MOV_ID), 
+FOREIGN KEY (ACT_ID) REFERENCES ACTOR (ACT_ID), 
+FOREIGN KEY (MOV_ID) REFERENCES 
+MOVIES (MOV_ID)
+);
+
+CREATE TABLE RATING ( 
+MOV_ID int (4), 
+REV_STARS VARCHAR (25), 
+PRIMARY KEY (MOV_ID), 
+FOREIGN KEY (MOV_ID) 
+REFERENCES MOVIES (MOV_ID));
+
+INSERT INTO ACTOR VALUES (301,'ANUSHKA','F'); 
+INSERT INTO ACTOR VALUES (302,'PRABHAS','M'); 
+INSERT INTO ACTOR VALUES (303,'PUNITH','M'); 
+INSERT INTO ACTOR VALUES (304,'JERMY','M'); 
+
+INSERT INTO DIRECTOR VALUES (60,'RAJAMOULI', 875161100); 
+INSERT INTO DIRECTOR VALUES (61,'HITCHCOCK', 776613891); 
+INSERT INTO DIRECTOR VALUES (62,'FARAN', 998677653); 
+INSERT INTO DIRECTOR VALUES (63,'STEVEN SPIELBERG', 898977653); 
+
+INSERT INTO MOVIES VALUES (1001,'BAHUBALI-2', 2017, 'TELAGU', 60); 
+INSERT INTO MOVIES VALUES (1002,'BAHUBALI-1', 2015, 'TELAGU', 60); 
+INSERT INTO MOVIES VALUES (1003,'AKASH', 2008, 'KANNADA', 61); 
+INSERT INTO MOVIES VALUES (1004,'WAR HORSE', 2011, 'ENGLISH', 63);
+
+INSERT INTO MOVIE_CAST VALUES (301, 1002, 'HEROINE'); 
+INSERT INTO MOVIE_CAST VALUES (301, 1001, 'HEROINE'); 
+INSERT INTO MOVIE_CAST VALUES (303, 1003, 'HERO'); 
+INSERT INTO MOVIE_CAST VALUES (303, 1002, 'GUEST'); 
+INSERT INTO MOVIE_CAST VALUES (304, 1004, 'HERO'); 
+
+
+INSERT INTO RATING VALUES (1001, 4); 
+INSERT INTO RATING VALUES (1002, 2);
+
+INSERT INTO RATING VALUES (1003, 5); 
+INSERT INTO RATING VALUES (1004, 4);
+
+-- Query1 
+select mov_title from movies,director
+where dir_name ='HITCHCOCK' and 
+movies.dir_id = director.dir_id; 
+
+--Query2
+
+select mov_title from movies m,movie_cast mc
+where m.mov_id = mc.mov_id
+and act_id in (
+
+    select act_id from movie_cast 
+    group by act_id
+    having count(mov_id)>1
+)
+group by mov_title
+having count(*)>1;
+
+-- Query3
+
+SELECT  A.ACT_NAME, C.MOV_TITLE, C.MOV_YEAR 
+FROM ACTOR A, MOVIE_CAST B, MOVIES C 
+WHERE A.ACT_ID=B.ACT_ID 
+AND B.MOV_ID=C.MOV_ID 
+AND C.MOV_YEAR NOT BETWEEN 2000 AND 2015;
+
+
+
+-- query4
+select m.mov_title ,r.rev_stars from movies m
+,rating r where m.mov_id = r.mov_id
+group by m.mov_title 
+having sum(r.rev_stars) >=1
+order by m.mov_title;
+
+-- query 5
+update rating 
+set rev_stars =5
+where mov_id in(
+
+    select m.mov_id from
+    movies m,director d
+    where dir_name ='STEVEN SPOELBERG'
+    and d.dir_id = m.dir_id 
+);
+select * from Rating;
+
+
+
+
+
+
+
+
+
